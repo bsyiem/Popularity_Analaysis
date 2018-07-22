@@ -1,0 +1,15 @@
+noc=number of clusters
+
+second reduce doesn't combine the clusters
+ 
+args[0]= input path
+
+args[1]= output path
+
+args[2]= number of clusters
+
+para = no of clusters as well in configuration
+
+clusterno in reducer = no of items in the same cluster (key value = particular cluster)
+
+in reducer tmpmeans = avg mean , means = sum of means in a cluster,tmp = extracted mean from mapper line 

@@ -1,0 +1,97 @@
+ALGORITHM
+
+1)create class Brands to store and manipulate Cluster Means.
+
+MAIN 
+
+1)initial set counter to zero and chk = true
+ 
+//chk = true when means are not equal
+
+2)getInt of no of clusters (args[2])
+3)if counter =0, set para = args[2],set count = counter,set outf to output folder.
+4)do
+	MAPPER------[1]
+	
+		a)get 'para','count','outf'
+		b)create Brands global
+		c) set global.noc=(int)args[2]
+			//global.no=0 static
+		d)create double tmpN[2] and tmpM[2] and dist[noc]
+		e)from line store first token to tmpN[0] and second token to tmp[1] (ex: tmpN[0]=1 and tmpN[1]=4 where 1,4 is the coordinates)
+
+		/*line = part of text analysed by mapper ( in this case a coordinate)*/
+			
+		f)if global.no < global.noc then
+			and if counter =0 then
+				global.means[no][0]=tmpN[0]
+				global.means[no][1]=tmpN[1]
+				m=no
+				no= m+1
+		g)write to context (part-m-00000) (m,line)
+	
+	REDUCER(1)------[1]
+
+	for each key 
+	a)clusterno=0, means[2]= {0,0}
+	
+	while value.hasNext (ie more tokens)
+	b)convert value toString (ie the coordinate)
+	c)tmp[0] =(double)x-coordinate from value
+	  tmp[1]=(double)y-coordinate from value
+	d) means[0]= means[0]+tmp[0]
+	   means[1]= means[1]+tmp[1]
+	e) tmpmeans[0]= means[0]/clusterno
+	   tmpmeans[1]= means[1]/clusterno
+	
+	f)strmeans = (String (tmpmeans[0]+" "+tmpmeans[1]))
+	g) context (part-r-00000) (key,strmeans) 
+ 	//key = clusterno from mapper
+
+MAIN
+
+5)chk if means are same .. if same chk=false	
+6) counter++
+7)while(chk=true)
+
+8) if counter>0
+	if File inPath2=new File("/home/hduser/part-r-00000") exists
+	then delete the file 
+
+9)inPath1 = new Path(args[1]+"/o"+(counter-1)+"/part-r-00000");//args[1]+"/o"+(counter-1)+"/part-r-00000");
+                                Path inPath1=new Path("/home/hduser/"); //previous output from reducer
+
+10) fs.copyToLocalFile(inPath,inPath1);/*copy reducer output to local file system*/
+
+11)BufferedReader in1=new BufferedReader(new FileReader(inPath2));
+
+12)for i=0;i<noc;i++
+	tmpmeans = in1.readLine(inPath2); //read each average mean from previous reducer output
+
+13)tmpdb1[0]=x-coordinate mean 
+   tmpdb1[1]=y-coordinate mean
+
+14)tmp[0]=tmpdb1[0]
+   tmp[1]=tmpdb1[1]
+
+	MAPPER
+		
+	a) get means from previous reducer output .. similar to MAIN
+	b)global.setmean() from previous reducer output 
+	c) same steps as MAPPER -----[1] after the first two steps
+
+	
+MAIN
+
+15) if chk == false
+
+	REDUCER(1) 
+		a) same as REDUCER(1)---[1]
+
+	else
+	
+	REDUCER(2)
+	
+	a)mimic output of the last MAPPER operation but takes the coordinates as key and the clusternumber as value
+		i.e,
+			 context.write(values.iterator().next(),key);
